@@ -7,7 +7,7 @@ from rest_framework.serializers import ValidationError
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = ['id', 'school_name']
+        fields = ['id', 'school_name', 'created_at', 'updated_at']
 
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -26,11 +26,11 @@ class TeachersSerializer(serializers.ModelSerializer):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ['id', 'Subject']
+        fields = ['id', 'subject']
 
     def validate_Subject(self, data):
-        class_name = data['class_name']
-        query = Class.object.filter(class_name=class_name)
+        Subject = data['Subject']
+        query = Subject.object.filter(class_name=Subject)
         if query.exists():
             raise ValidationError()
         return data
