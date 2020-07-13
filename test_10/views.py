@@ -1,5 +1,6 @@
 from rest_framework.response import Response
-from .serializers import  SchoolSerializer, ClassSerializer, TeacherSerializer, StudentSerilizer, SubjectSerializer, TeachersSerializer, ClassStudentSerializer
+from .serializers import SchoolSerializer, ClassSerializer, TeacherSerializer, StudentSerializer, SubjectSerializer,\
+    TeachersSerializer, ClassStudentSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import School, Class, Teacher, Student, Subject
@@ -101,11 +102,11 @@ class StudentAPIView(APIView):
 
     def get(self, request):
         student = Student.objects.all()
-        serializer = StudentSerilizer(student, many=True)
+        serializer = StudentSerializer(student, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = StudentSerilizer(data=request.data)
+        serializer = StudentSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -215,7 +216,7 @@ class TeacherUpdateAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class StudentListUpdateAPIView(APIView):
+class StudentUpdateAPIView(APIView):
 
     def get_object(self, id):
         try:
@@ -226,12 +227,12 @@ class StudentListUpdateAPIView(APIView):
 
     def get(self, request, id):
         student = self.get_object(id)
-        serializer = StudentListSerializer(student)
+        serializer = StudentSerializer(student)
         return Response(serializer.data)
 
     def put(self, request, id):
         student = self.get_object(id)
-        serializer = StudentListSerializer(student, data=request.data)
+        serializer = StudentSerializer(student, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

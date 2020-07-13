@@ -65,7 +65,7 @@ class ClassSerializer(serializers.ModelSerializer):
         return data
 
 
-class StudentSerilizer(serializers.ModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ['id', 'first_name', 'last_name']
