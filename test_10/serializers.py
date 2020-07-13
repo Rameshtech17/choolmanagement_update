@@ -29,8 +29,8 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'subject']
 
     def validate_Subject(self, data):
-        Subject = data['Subject']
-        query = Subject.object.filter(class_name=Subject)
+        subject = data['Subject']
+        query = Subject.object.filter(class_name=subject)
         if query.exists():
             raise ValidationError()
         return data
