@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 class School(models.Model):
     school_name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True, null=True)

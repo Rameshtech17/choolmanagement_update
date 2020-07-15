@@ -15,5 +15,8 @@ urlpatterns = [
     path('teacher_update/<id>/', views.TeacherUpdateAPIView.as_view()),
     path('subject_update/<id>/', views.SubjectUpdateAPIView.as_view()),
     path('school_update/<id>/', views.SchoolUpdateAPIView.as_view()),
+    path('users/', views.UserList.as_view()),
+    path('users/<pk>/', views.UserDetails.as_view()),
+    path('groups/', views.GroupList.as_view()),
 
 ]

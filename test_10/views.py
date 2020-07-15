@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from .serializers import SchoolSerializer, ClassSerializer, TeacherSerializer, StudentSerializer, SubjectSerializer,\
-    TeachersSerializer, ClassStudentSerializer
+    TeachersSerializer, ClassStudentSerializer, UserSerializer, GroupSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import School, Class, Teacher, Student, Subject
@@ -8,7 +8,32 @@ from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from rest_framework import status, generics
+from django.contrib.auth.models import User, Group
 
+
+
+
+from rest_framework import generics, permissions, serializers
+
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+
+# first we define the serializers
+
+class UserList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetails(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class GroupList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+    required_scopes = ['groups']
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class SchoolAPIView(APIView):
