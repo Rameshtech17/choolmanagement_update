@@ -1,0 +1,217 @@
+class Author(models.Model):
+    name = models.CharField(max_length=100, default="")
+    last_name = models.IntegerField(max_length=100, default="")
+ 
+    def __str__(self):
+        return self.name
+
+
+class Book(models.Model):
+    authors = models.ManyToManyField(Author, related_name="book_list", blank=True)
+    name = models.CharField(max_length=100, default="")
+    published = models.BooleanField(default=True)
+ 
+    def __str__(self):
+        return self.name
+
+
+class Album(models.Model):
+    album_name = models.CharField(max_length=100)
+    artist = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.album_name
+
+
+class Track(models.Model):
+    album = models.ForeignKey(Album, related_name='tracks', on_delete=models.CASCADE)
+    order = models.IntegerField()
+    title = models.CharField(max_length=100)
+    duration = models.IntegerField()
+
+    class Meta:
+        unique_together = ['album', 'order', 'title']
+        ordering = ['order']
+
+    def __str__(self):
+        return '%d: %d: %s : %d' % (self.id, self.order, self.title, self.duration)
+
+
+Creating objects
+
+>>> from manytomany.models import Author
+>>> A= Author(name="Ramesh", last_name= 1)
+>>> A.save()
+Saving changes to objects
+>>> A.name ="Rajesh"
+>>> A.save()
+
+Saving ForeignKey and ManyToManyField fields
+>>> from manytomany.models import Album,Track
+>>> track= Track.objects.get(pk = 1)
+>>> album=Album.objects.get(album_name = "Roja")
+>>> track.album = album
+>>> track.save()
+
+>>> from manytomany.models import Album,Track,Author,Book
+>>> name=Author.objects.create(name="Raja")
+>>> book=Book.objects.get(pk=1)
+>>> book.authors.add(name)
+
+>>> name1=Author.objects.create(name="Raju")
+>>> name2=Author.objects.create(name="Kalai")
+>>> name3=Author.objects.create(name="Kavi")
+>>> book.authors.add(name1,name2,name3)
+
+
+Retrieving objects
+ Book.objects
+<django.db.models.manager.Manager object at 0x7f43272c3880>
+
+Retrieving all objects
+
+>>> all_books = Book.objects.all()
+>>> all_books
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (3)>, <Book: Book object (4)>]>
+
+Retrieving specific objects with filters
+>>> Book.objects.filter(name="book1")
+<QuerySet [<Book: Book object (1)>, <Book: Book object (3)>]>
+
+Filtered QuerySets are unique
+>>> Book.objects.filter(name="book1")
+<QuerySet [<Book: Book object (1)>, <Book: Book object (3)>]>
+>>> q=Book.objects.filter(name="book1")
+>>> q=q.filter(published=True)
+>>> print(q)
+<QuerySet [<Book: Book object (1)>]>
+
+Retrieving a single object with get()
+>>> book= Book.objects.get(pk=1)
+>>> print(book)
+Book object (1)
+
+Limiting QuerySets
+>>> book= Book.objects.all()[:3]
+>>> print(book)
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (4)>]>
+
+>>> book= Book.objects.all()[1:3]
+>>> print(book)
+<QuerySet [<Book: Book object (2)>, <Book: Book object (4)>]>
+
+Field lookups
+>>> book= Book.objects.filter(published=True)
+>>> print(book)
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (4)>, <Book: Book object (5)>]>
+
+>>> book= Book.objects.filter(name="book1")
+>>> print(book)
+<QuerySet [<Book: Book object (1)>, <Book: Book object (3)>, <Book: Book object (5)>]>
+
+>>> author= Author.objects.filter(name="Raja")
+>>> print(author)
+<QuerySet [<Author: Author object (5)>]>
+>>> 
+
+__ exact
+>>> author= Author.objects.get(name__exact="raja")
+>>> print(author)
+Author object (9)
+
+__contains
+>>> author= Author.objects.get(name__contains="raja")
+>>> print(author)
+Author object (9)
+>>> author= Author.objects.get(name__contains="Raja")
+>>> print(author)
+Author object (5)
+
+Lookups that span relationships
+>>> book= Book.objects.filter(authors__name="Raja")
+>>> print(book)
+<QuerySet [<Book: Book object (1)>]>
+
+>>> author= Author.objects.filter(name="Raja")
+>>> print(author)
+<QuerySet [<Author: Author object (5)>]>
+
+Spanning multi-valued relationships
+>>> book= Book.objects.filter(authors__name="Raja",authors__last_name=1)
+>>> print(book)
+<QuerySet [<Book: Book object (1)>]>
+>>> 
+
+>>> book= Book.objects.filter(authors__name="Raja").filter(authors__last_name=1)
+>>> print(book)
+<QuerySet [<Book: Book object (1)>, <Book: Book object (1)>]>
+>>> 
+
+The pk lookup shortcut
+>>> Book.objects.get(pk=1)
+<Book: Book object (1)>
+>>> Book.objects.get(id=1)
+<Book: Book object (1)>
+>>> Book.objects.get(id__exact=1)
+<Book: Book object (1)>
+>>> 
+
+Caching and QuerySets
+>>> print([a.name for a in Author.objects.all()])
+['1st', '2nd', 'ramesh', 'Rajesh', 'Raju', 'Kalai', 'Kavi', 'raja', 'Raja']
+>>> print([a.name for a in Book.objects.all()])
+['book1', 'book2', 'book2', 'book1', 'book1']
+ 
+>>> queryset= Book.objects.all()
+>>> print([a.name for a in queryset])
+['book1', 'book2', 'book2', 'book1', 'book1']
+ 
+When QuerySets are not cached
+>>> queryset= Book.objects.all()
+>>> print(queryset[1])
+Book object (2)
+
+>>> [a.name for a in queryset]
+['book1', 'book2', 'book2', 'book1', 'book1']
+>>> [a.name for a in queryset]
+
+>>> bool(queryset)
+True
+>>> list(queryset)
+[<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (4)>, <Book: Book object (3)>, <Book: Book object (5)>]
+>>> 
+
+Comparing objects
+>>> Book.pk == Author.pk
+True
+>>> Book.name == Author.name
+False
+>>> 
+
+Deleting objects
+>>> queryset= Book.objects.all()
+>>> [a.name for a in queryset]
+['book1', 'book2', 'book2', 'book1', 'book1']
+
+>>> Book.objects.filter(name = "book1").delete()
+(10, {'manytomany.Book_authors': 7, 'manytomany.Book': 3})
+
+>>> queryset= Book.objects.all()
+>>> [a.name for a in queryset]
+['book2', 'book2']
+
+ queryset= Author.objects.all()
+>>> [a.name for a in queryset]
+['1st', '2nd', 'ramesh', 'Rajesh', 'Raju', 'Kalai', 'Kavi', 'raja', 'Raja']
+>>> A=Author.objects.get(pk=1)
+>>> A.delete()
+(2, {'manytomany.Book_authors': 1, 'manytomany.Author': 1})
+
+>>> [a.name for a in queryset]
+['2nd', 'ramesh', 'Rajesh', 'Raju', 'Kalai', 'Kavi', 'raja', 'Raja']
+
+Copying model instances
+>>> author=Author(name="1st",last_name=1)
+>>> author.save()
+>>> author.pk=None
+>>> author.save()
