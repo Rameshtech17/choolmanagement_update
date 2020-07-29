@@ -9,15 +9,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from rest_framework import status, generics
 from django.contrib.auth.models import User, Group
-
-
-
-
 from rest_framework import generics, permissions, serializers
 
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
-# first we define the serializers
 
 class UserList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
@@ -65,7 +60,6 @@ class SearchAPIView(generics.ListAPIView):
     serializer_class = TeacherSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filter_fields = ('Class', 'TeacherName')
-    # search_fields = ('id'.'Class', 'TeacherName')
 
 
 class ClassAPIView(APIView):
@@ -73,11 +67,12 @@ class ClassAPIView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
-        Clas = Class.objects.all()
-        serializer = ClassSerializer(Clas, many=True)
+        clas = Class.objects.all()
+        serializer = ClassSerializer(clas, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+        # Class(class_name)
         serializer = ClassSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -90,8 +85,8 @@ class ClassStudentAPIView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
-        Clas = Class.objects.all()
-        serializer = ClassStudentSerializer(Clas, many=True)
+        clas = Class.objects.all()
+        serializer = ClassStudentSerializer(clas, many=True)
         return Response(serializer.data)
 
     def post(self, request):
