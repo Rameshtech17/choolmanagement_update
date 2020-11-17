@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'test_10',
     'oauth2_provider',
-    'rest_framework'
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

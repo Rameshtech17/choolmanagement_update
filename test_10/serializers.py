@@ -1,8 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from .models import Teacher, Student, School, Subject, Class
 from rest_framework.serializers import ValidationError
-
 from django.contrib.auth.models import User, Group
 
 
@@ -71,7 +69,7 @@ class ClassSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Class
-        fields = ['id', 'class_name', 'student']
+        fields = ['id', 'class_name']
 
     def validate_class_name(self, data):
         class_name = data['class_name']
@@ -86,24 +84,24 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = ['id', 'first_name', 'last_name']
 
-    def validate_first_name(self, data):
-        first_name = data['first_name']
-        query = Student.object.filter(first_name=first_name)
-        if query.exists():
-            raise ValidationError()
-        return data
-
-    def create(self, validated_data):
-        first_name = validated_data['first_name']
-        last_name = validated_data['last_name']
-        obj_data = Student(first_name=first_name,
-                           last_name=last_name,
-                           )
-        obj_data.save()
-        return validated_data
-
-    def update(self, instance, validated_data):
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.save()
-        return instance
+    # def validate_first_name(self, data):
+    #     first_name = data['first_name']
+    #     query = Student.object.filter(first_name=first_name)
+    #     if query.exists():
+    #         raise ValidationError()
+    #     return data
+    #
+    # def create(self, validated_data):
+    #     first_name = validated_data['first_name']
+    #     last_name = validated_data['last_name']
+    #     obj_data = Student(first_name=first_name,
+    #                        last_name=last_name,
+    #                        )
+    #     obj_data.save()
+    #     return validated_data
+    #
+    # def update(self, instance, validated_data):
+    #     instance.first_name = validated_data.get('first_name', instance.first_name)
+    #     instance.last_name = validated_data.get('last_name', instance.last_name)
+    #     instance.save()
+    #     return instance

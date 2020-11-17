@@ -18,7 +18,7 @@ class Class(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return self.class_name
+        return '%s' % (self.class_name)
 
 
 class Student(models.Model):
